@@ -5,9 +5,11 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Store is Ownable {
     /// @notice buyer => product_id => quantity
-    mapping(address => mapping(uint256 => uint256)) public userPurchase;
+    mapping(address => PurchaseHistory[]) public userPurchase;
     /// @notice product_id => quantity
     mapping(uint256 => uint256) public productsPurchase;
+
+    /// @notice product description
     struct Product {
         string name;
         uint256 id;
@@ -93,7 +95,6 @@ contract Store is Ownable {
         Product storage product = findProduct(_id);
         product.stock -= _quantity;
 
-        userPurchase[buyer][_id] += _quantity;
         productsPurchase[_id] += _quantity;
 
         setPurchaseHistory(buyer, product.price * _quantity);
@@ -190,17 +191,17 @@ contract Store is Ownable {
         purchases.push(PurchaseHistory(buyer, purchaseId, _totalAmout));
     }
 
+    /// Возможно надо еще обновить количество товара после возврата денег
     /// @notice Refund money for last purchase for buyer
     /// @param _buyer Buyer
-     function refund(address _buyer) public payable {
-    PurchaseHistory memory lastPurchase = getLastPurchase(_buyer);
+    function refund(address _buyer) public payable {
+        PurchaseHistory memory lastPurchase = getLastPurchase(_buyer);
         uint256 balance = address(this).balance + lastPurchase.totalAmount;
 
         require(balance > 0, "Not enought money");
 
         payable(owner()).transfer(lastPurchase.totalAmount);
-     }
-
+    }
 
     /// @notice Get last purchase of buyer
     /// address buyer Buyer
@@ -216,5 +217,25 @@ contract Store is Ownable {
         }
 
         return purchasesForCurrentBuyer[purchasesForCurrentBuyer.length - 1];
+    }
+
+    /// @notice get amount of money, which a shop get
+    function getTotalRevenue() public view returns (uint256) {
+        uint256 totalRevenue;
+
+        for (uint256 i = 0; i < purchases.length; i++) {
+            totalRevenue += purchases[i].totalAmount;
+        }
+        return totalRevenue;
+    }
+
+    /// @notice get history of purchases for current buyer
+    function getUserPurchase(address _buyer) public {
+        for (uint256 i = 0; i < purchases.length; i++) {
+            if (purchases[i].buyer == _buyer) {
+                purchasesForCurrentBuyer.push(purchases[i]);
+            }
+        }
+        userPurchase[_buyer] = purchasesForCurrentBuyer;
     }
 }

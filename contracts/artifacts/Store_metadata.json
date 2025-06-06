@@ -289,6 +289,32 @@
 			},
 			{
 				"inputs": [],
+				"name": "getTotalRevenue",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_buyer",
+						"type": "address"
+					}
+				],
+				"name": "getUserPurchase",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
 				"name": "owner",
 				"outputs": [
 					{
@@ -462,8 +488,18 @@
 				"name": "userPurchase",
 				"outputs": [
 					{
+						"internalType": "address",
+						"name": "buyer",
+						"type": "address"
+					},
+					{
 						"internalType": "uint256",
-						"name": "",
+						"name": "purchaseId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "totalAmount",
 						"type": "uint256"
 					}
 				],
@@ -521,11 +557,17 @@
 				"getLastPurchase(address)": {
 					"notice": "Get last purchase of buyer address buyer Buyer"
 				},
+				"getTotalRevenue()": {
+					"notice": "get amount of money, which a shop get"
+				},
+				"getUserPurchase(address)": {
+					"notice": "get history of purchases for current buyer"
+				},
 				"productsPurchase(uint256)": {
 					"notice": "product_id => quantity"
 				},
 				"refund(address)": {
-					"notice": "Refund money for last purchase for buyer"
+					"notice": "Возможно надо еще обновить количество товара после возврата денегRefund money for last purchase for buyer"
 				},
 				"userPurchase(address,uint256)": {
 					"notice": "buyer => product_id => quantity"
@@ -567,11 +609,11 @@
 			]
 		},
 		"contracts/Shope.sol": {
-			"keccak256": "0x39c614cbb73c69c606a38e9a00dd38af07d4c48d12a46ca843a9fcb0e05d3039",
+			"keccak256": "0xb5ee6cb9c0235cfa62c1b777f453b0106b9a675cdd8bef7c23dc7df2ae5ecf74",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://f0d8a0db7045e3182a116f8b36f9f2596e2f540763de64d5806f1e0f5abb520d",
-				"dweb:/ipfs/QmVx2nvu4auouUqiTssMeNRjU81yoxe9BNQneVWgcsPQoN"
+				"bzz-raw://2fd5a1e51c4c9c0af3c37df766f4c67844e0adc6b5f0b82e1338553390b06069",
+				"dweb:/ipfs/QmQ7MfAehyTpdX1pea6fJ9pbMwsN5NvnPKgVsw7WfZG9Pg"
 			]
 		}
 	},
