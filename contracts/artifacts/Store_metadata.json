@@ -181,42 +181,6 @@
 			{
 				"inputs": [
 					{
-						"internalType": "address",
-						"name": "_buyer",
-						"type": "address"
-					}
-				],
-				"name": "getLastPurchase",
-				"outputs": [
-					{
-						"components": [
-							{
-								"internalType": "address",
-								"name": "buyer",
-								"type": "address"
-							},
-							{
-								"internalType": "uint256",
-								"name": "purchaseId",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "totalAmount",
-								"type": "uint256"
-							}
-						],
-						"internalType": "struct Store.PurchaseHistory",
-						"name": "",
-						"type": "tuple"
-					}
-				],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
 						"internalType": "uint256",
 						"name": "_id",
 						"type": "uint256"
@@ -529,11 +493,6 @@
 			},
 			"kind": "dev",
 			"methods": {
-				"getLastPurchase(address)": {
-					"returns": {
-						"_0": "Purchase with max purchaseId among purchases of buyer"
-					}
-				},
 				"owner()": {
 					"details": "Returns the address of the current owner."
 				},
@@ -554,9 +513,6 @@
 		"userdoc": {
 			"kind": "user",
 			"methods": {
-				"getLastPurchase(address)": {
-					"notice": "Get last purchase of buyer address buyer Buyer"
-				},
 				"getTotalRevenue()": {
 					"notice": "get amount of money, which a shop get"
 				},
@@ -609,11 +565,11 @@
 			]
 		},
 		"contracts/Shope.sol": {
-			"keccak256": "0xb5ee6cb9c0235cfa62c1b777f453b0106b9a675cdd8bef7c23dc7df2ae5ecf74",
+			"keccak256": "0xd560a1b3d7cb537ffc52a6c12ce0b0df1ff458633c3125c3e4d3acd3bf581208",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://2fd5a1e51c4c9c0af3c37df766f4c67844e0adc6b5f0b82e1338553390b06069",
-				"dweb:/ipfs/QmQ7MfAehyTpdX1pea6fJ9pbMwsN5NvnPKgVsw7WfZG9Pg"
+				"bzz-raw://67bb669c6aa90c03582fbd794e6b6e499fddfe5b53b4db6e8ee4124d1c717580",
+				"dweb:/ipfs/QmecJwnfFhjK9eTfX3jsdNpBn56VGGBfRAtAKd4ZUdT4vf"
 			]
 		}
 	},

@@ -207,16 +207,12 @@ contract Store is Ownable {
     /// address buyer Buyer
     /// @return Purchase with max purchaseId among purchases of buyer
     function getLastPurchase(address _buyer)
-        public
+        internal
+        view
         returns (PurchaseHistory memory)
     {
-        for (uint256 i = 0; i < purchases.length; i++) {
-            if (purchases[i].buyer == _buyer) {
-                purchasesForCurrentBuyer.push(purchases[i]);
-            }
-        }
-
-        return purchasesForCurrentBuyer[purchasesForCurrentBuyer.length - 1];
+        PurchaseHistory[] memory currentBuyer = userPurchase[_buyer];
+        return currentBuyer[currentBuyer.length - 1];
     }
 
     /// @notice get amount of money, which a shop get
@@ -229,8 +225,11 @@ contract Store is Ownable {
         return totalRevenue;
     }
 
+    // Нужно чтобы эта функция возвращала значения
     /// @notice get history of purchases for current buyer
-    function getUserPurchase(address _buyer) public {
+    function getUserPurchase(address _buyer)
+        public
+    {
         for (uint256 i = 0; i < purchases.length; i++) {
             if (purchases[i].buyer == _buyer) {
                 purchasesForCurrentBuyer.push(purchases[i]);
