@@ -4,11 +4,13 @@ pragma solidity ^0.8.28;
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Store is Ownable {
-    /// @notice buyer => product_id => quantity
-    mapping(address => PurchaseHistory[]) public userPurchase;
     /// @notice product_id => quantity
     mapping(uint256 => uint256) public productsPurchase;
+    /// @notice addressof buyer => history of purchases
+    mapping(address => PurchaseHistory[]) public userPurchases;
 
+    /// @notice productName => quantity of purchases
+    mapping(string => uint256) public purchaseNameQuantity;
     /// @notice product description
     struct Product {
         string name;
@@ -20,11 +22,16 @@ contract Store is Ownable {
     /// @notice history of purchases
     struct PurchaseHistory {
         address buyer;
+        string productName;
         uint256 purchaseId;
         uint256 totalAmount;
     }
 
-    PurchaseHistory[] public purchasesForCurrentBuyer;
+    /// @notice Show quantity of purchases
+    struct PurchaseQuantity {
+        string productName;
+        uint256 purchaseNumber;
+    }
 
     Product[] private products;
     PurchaseHistory[] public purchases;
@@ -94,10 +101,17 @@ contract Store is Ownable {
     ) internal {
         Product storage product = findProduct(_id);
         product.stock -= _quantity;
-
+     
         productsPurchase[_id] += _quantity;
-
-        setPurchaseHistory(buyer, product.price * _quantity);
+        PurchaseHistory memory newPurchase = PurchaseHistory(
+            buyer,
+            product.name,
+            purchaseId++,
+            product.price * _quantity
+        );
+        purchases.push(newPurchase);
+        userPurchases[buyer].push(newPurchase);
+        purchaseNameQuantity[product.name] += _quantity;
         emit Purchase(buyer, _id, _quantity);
     }
 
@@ -183,39 +197,39 @@ contract Store is Ownable {
 
     /// HomeTask
 
-    ///@notice Set history of purchases of current buyer
-    /// @param buyer Buyer
-    /// @param _totalAmout Sum, which buyer spend for purchase
-    function setPurchaseHistory(address buyer, uint256 _totalAmout) internal {
-        purchaseId++;
-        purchases.push(PurchaseHistory(buyer, purchaseId, _totalAmout));
-    }
-
-    /// Возможно надо еще обновить количество товара после возврата денег
-    /// @notice Refund money for last purchase for buyer
-    /// @param _buyer Buyer
+    /// @notice Refund money for last purchase
+    /// @param _buyer Buyer address
     function refund(address _buyer) public payable {
-        PurchaseHistory memory lastPurchase = getLastPurchase(_buyer);
+        uint256 buyerPurchasesLength = userPurchases[_buyer].length;
+        PurchaseHistory memory lastPurchase = userPurchases[_buyer][
+            buyerPurchasesLength - 1
+        ];
+
         uint256 balance = address(this).balance + lastPurchase.totalAmount;
 
         require(balance > 0, "Not enought money");
-
         payable(owner()).transfer(lastPurchase.totalAmount);
     }
 
-    /// @notice Get last purchase of buyer
-    /// address buyer Buyer
-    /// @return Purchase with max purchaseId among purchases of buyer
-    function getLastPurchase(address _buyer)
-        internal
+    /// @notice Get purchases history
+    /// @param _buyer Buyer address
+    /// @return purchases history
+    function getUserPurchase(address _buyer, uint256 _purchaseId)
+        public
         view
         returns (PurchaseHistory memory)
     {
-        PurchaseHistory[] memory currentBuyer = userPurchase[_buyer];
-        return currentBuyer[currentBuyer.length - 1];
+        PurchaseHistory memory purchase;
+        PurchaseHistory[] storage buyerPurchases = userPurchases[_buyer];
+        for (uint256 i = 0; i < buyerPurchases.length; i++) {
+            if (_purchaseId == buyerPurchases[i].purchaseId) {
+                purchase = userPurchases[_buyer][i];
+            }
+        }
+        return purchase;
     }
 
-    /// @notice get amount of money, which a shop get
+    /// @notice Get total sum, which shop get
     function getTotalRevenue() public view returns (uint256) {
         uint256 totalRevenue;
 
@@ -225,16 +239,25 @@ contract Store is Ownable {
         return totalRevenue;
     }
 
-    // Нужно чтобы эта функция возвращала значения
-    /// @notice get history of purchases for current buyer
-    function getUserPurchase(address _buyer)
+    /// @notice Get a most popular selling product
+    function getTopSellingProducts()
         public
+        view
+        returns (PurchaseQuantity memory mostPurchasesProduct)
     {
+        uint256 maxAmountPurchases;
+        string memory mostSellingProduct;
         for (uint256 i = 0; i < purchases.length; i++) {
-            if (purchases[i].buyer == _buyer) {
-                purchasesForCurrentBuyer.push(purchases[i]);
+            string memory productName = purchases[i].productName;
+            uint256 productQuantity = purchaseNameQuantity[productName];
+            if (
+                productQuantity
+                > maxAmountPurchases
+            ) {
+                maxAmountPurchases = productQuantity;
+                mostSellingProduct = productName;
             }
         }
-        userPurchase[_buyer] = purchasesForCurrentBuyer;
+        return PurchaseQuantity(mostSellingProduct, maxAmountPurchases);
     }
 }
